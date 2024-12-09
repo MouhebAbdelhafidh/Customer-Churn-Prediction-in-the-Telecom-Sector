@@ -11,4 +11,4 @@ Here are some recommended research papers that may provide useful insights: <br>
 
 **Note**:The dataset link is provided inside the notebook <br>
 **Models and algorithms used**: <br>
-Logistic Regression/ KNN/ SVM/ Decision tree (bagging)/ Random forest/ GBM/ XGboost/ LightGBM
+Logistic Regression/ KNN/ SVM/ Decision tree/ Random forest/ GBM/ XGboost/ LightGBM
