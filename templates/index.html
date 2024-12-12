@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customer Churn Prediction</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f7fc;
+      }
+      .container {
+        width: 60%;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+      h1 {
+        text-align: center;
+      }
+      input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      #prediction-result {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .error {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Customer Churn Prediction</h1>
+
+      <label for="csv-file">Upload CSV File:</label>
+      <input type="file" id="csv-file" name="csv-file" accept=".csv" />
+
+      <button onclick="makePrediction()">Predict Churn</button>
+
+      <div id="prediction-result"></div>
+    </div>
+
+    <script>
+      async function makePrediction() {
+        const fileInput = document.getElementById("csv-file");
+        const file = fileInput.files[0];
+
+        if (!file) {
+          document.getElementById("prediction-result").innerHTML =
+            "<p class='error'>Please upload a CSV file.</p>";
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("csv_file", file);
+
+        try {
+          const response = await fetch("/predict", {
+            method: "POST",
+            body: formData,
+          });
+
+          const result = await response.json();
+
+          if (result.error) {
+            document.getElementById(
+              "prediction-result"
+            ).innerHTML = `<p class="error">${result.error}</p>`;
+          } else {
+            let predictions = result.predictions
+              .map((prediction, index) => {
+                return `Row ${index + 1}: Predicted Churn: ${prediction}`;
+              })
+              .join("<br>");
+            document.getElementById("prediction-result").innerHTML =
+              predictions;
+          }
+        } catch (error) {
+          document.getElementById(
+            "prediction-result"
+          ).innerHTML = `<p class="error">Error: ${error}</p>`;
+        }
+      }
+    </script>
+  </body>
+</html>
