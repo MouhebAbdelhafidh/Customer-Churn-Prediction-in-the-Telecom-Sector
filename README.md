@@ -11,4 +11,21 @@ Here are some recommended research papers that may provide useful insights: <br>
 
 **Note**:The dataset link is provided inside the notebook <br>
 **Models and algorithms used**: <br>
-Logistic Regression/ KNN/ SVM/ Decision tree/ Random forest/ GBM/ XGboost/ LightGBM
+Logistic Regression/ KNN/ SVM/ Decision tree/ Random forest/ GBM/ XGboost/ LightGBM <br>
+
+**Steps** (CRISP-DM):<br>
+1. Business understanding<br>
+2. Data understanding<br>
+   a. Data overview<br>
+   b. Data exploration<br>
+3. Data preparation<br>
+   a. Handeling outliers<br>
+   b. Feature engineering<br>
+         i. Encoding<br>
+         ii. Feature selection<br>
+         iii. Standarization<br>
+   c. Handeling imbalanced data<br>
+4. Modeling<br>
+   (All the models listed above with hyperparameters fine-tuning)<br>
+5. Evaluation<br>
+6. Deployment<br>
