@@ -3,75 +3,300 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Customer Churn Prediction</title>
+    <title>Customer Churn Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-      body {
-        font-family: Arial, sans-serif;
+      /* General reset */
+      * {
         margin: 0;
         padding: 0;
-        background-color: #f4f7fc;
+        box-sizing: border-box;
       }
-      .container {
-        width: 60%;
-        margin: 50px auto;
+
+      body {
+        font-family: Arial, sans-serif;
+        color: #333;
+        background-color: #f5f5f5;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      /* Sidebar styling */
+      .sidebar {
+        width: 250px;
+        background-color: #2c3e50;
+        color: #ecf0f1;
+        position: fixed;
+        height: 100%;
         padding: 20px;
-        background-color: #ffffff;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .sidebar h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 1.5em;
+        color: #e74c3c;
+      }
+
+      .sidebar a {
+        display: block;
+        color: #ecf0f1;
+        padding: 10px;
+        margin: 10px 0;
+        text-decoration: none;
+        font-size: 1em;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+      }
+
+      .sidebar a:hover {
+        background-color: #34495e;
+      }
+
+      /* Main content styling */
+      .main-content {
+        margin-left: 250px;
+        padding: 20px;
+        flex-grow: 1;
+        overflow-y: auto;
+      }
+
+      .navbar {
+        background-color: #e74c3c;
+        color: #fff;
+        padding: 15px;
+        font-size: 1.2em;
+        text-align: center;
+        margin-bottom: 20px;
         border-radius: 8px;
       }
-      h1 {
-        text-align: center;
+
+      .container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
-      input {
-        width: 100%;
-        padding: 10px;
+
+      h3 {
+        color: #2c3e50;
         margin-bottom: 15px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
+        font-size: 1.3em;
       }
+
+      input[type="file"],
+      input[type="text"],
+      input[type="number"],
       button {
+        display: block;
         width: 100%;
+        margin-bottom: 15px;
         padding: 10px;
-        background-color: #4caf50;
+        font-size: 1em;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+
+      input[type="file"],
+      input[type="text"],
+      input[type="number"] {
+        background-color: #f9f9f9;
+      }
+
+      button {
+        background-color: #e74c3c;
         color: white;
         border: none;
-        border-radius: 5px;
-        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
       }
+
       button:hover {
-        background-color: #45a049;
+        background-color: #c0392b;
       }
-      #prediction-result {
+
+      #bulk-result,
+      #individual-result {
+        margin-top: 15px;
+        padding: 10px;
+        background-color: #ecf0f1;
+        border: 1px solid #bdc3c7;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+
+      canvas {
         margin-top: 20px;
-        text-align: center;
-        font-size: 18px;
-        font-weight: bold;
+        max-width: 100%;
+        max-height: 400px;
       }
-      .error {
-        color: red;
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+      }
+
+      table,
+      th,
+      td {
+        border: 1px solid #ddd;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+      }
+
+      th {
+        background-color: #f4f4f4;
+      }
+
+      .see-more {
+        margin-top: 15px;
+        background-color: #3498db;
+        color: white;
+        padding: 10px;
+        cursor: pointer;
+        border: none;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+      }
+
+      .see-more:hover {
+        background-color: #2980b9;
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .sidebar {
+          width: 200px;
+        }
+
+        .main-content {
+          margin-left: 200px;
+        }
+
+        .navbar {
+          font-size: 1em;
+        }
+
+        h3 {
+          font-size: 1.1em;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .sidebar {
+          width: 150px;
+          font-size: 0.9em;
+        }
+
+        .main-content {
+          margin-left: 150px;
+        }
+
+        h3 {
+          font-size: 1em;
+        }
+
+        input[type="file"],
+        input[type="text"],
+        input[type="number"],
+        button {
+          font-size: 0.9em;
+        }
+
+        .navbar {
+          font-size: 0.9em;
+          padding: 10px;
+        }
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <h1>Customer Churn Prediction</h1>
+    <div class="sidebar">
+      <h2>Churn Dashboard</h2>
+      <a href="#">Home</a>
+      <a href="#">Upload</a>
+      <a href="#">Reports</a>
+      <a href="#">Settings</a>
+    </div>
 
-      <label for="csv-file">Upload CSV File:</label>
-      <input type="file" id="csv-file" name="csv-file" accept=".csv" />
+    <div class="main-content">
+      <div class="navbar">Customer Churn Prediction</div>
 
-      <button onclick="makePrediction()">Predict Churn</button>
+      <div class="container">
+        <!-- File Upload Section -->
+        <h3>Upload CSV File for Bulk Predictions</h3>
+        <input type="file" id="csv-file" accept=".csv" />
+        <button onclick="makePrediction()">Predict Churn</button>
 
-      <div id="prediction-result"></div>
+        <div id="bulk-result"></div>
+
+        <!-- Individual Form Section -->
+        <h3>Predict Churn for an Individual</h3>
+        <form
+          id="individual-prediction-form"
+          onsubmit="makeIndividualPrediction(event)"
+        >
+          <input type="text" name="state" placeholder="State" required />
+          <input
+            type="text"
+            name="international_plan"
+            placeholder="International Plan"
+            required
+          />
+          <input
+            type="text"
+            name="voice_mail_plan"
+            placeholder="Voice Mail Plan"
+            required
+          />
+          <input
+            type="number"
+            name="total_day_minutes"
+            placeholder="Total Day Minutes"
+            required
+          />
+          <input
+            type="number"
+            name="total_eve_minutes"
+            placeholder="Total Eve Minutes"
+            required
+          />
+          <input
+            type="number"
+            name="total_night_minutes"
+            placeholder="Total Night Minutes"
+            required
+          />
+          <button type="submit">Get Prediction</button>
+        </form>
+        <div id="individual-result"></div>
+
+        <!-- Chart Section -->
+        <canvas
+          id="prediction-chart"
+          width="400"
+          height="400"
+          style="display: none"
+        ></canvas>
+      </div>
     </div>
 
     <script>
       async function makePrediction() {
         const fileInput = document.getElementById("csv-file");
         const file = fileInput.files[0];
+        const resultContainer = document.getElementById("bulk-result");
 
         if (!file) {
-          document.getElementById("prediction-result").innerHTML =
-            "<p class='error'>Please upload a CSV file.</p>";
+          resultContainer.innerHTML = "<p>Please upload a CSV file.</p>";
           return;
         }
 
@@ -79,7 +304,7 @@
         formData.append("csv_file", file);
 
         try {
-          const response = await fetch("/predict", {
+          const response = await fetch("/", {
             method: "POST",
             body: formData,
           });
@@ -87,22 +312,89 @@
           const result = await response.json();
 
           if (result.error) {
-            document.getElementById(
-              "prediction-result"
-            ).innerHTML = `<p class="error">${result.error}</p>`;
+            resultContainer.innerHTML = `<p>${result.error}</p>`;
           } else {
-            let predictions = result.predictions
-              .map((prediction, index) => {
-                return `Row ${index + 1}: Predicted Churn: ${prediction}`;
-              })
-              .join("<br>");
-            document.getElementById("prediction-result").innerHTML =
-              predictions;
+            const predictions = result.predictions;
+
+            // Display the first 10 predictions in a table
+            const table = document.createElement("table");
+            const headerRow = document.createElement("tr");
+            headerRow.innerHTML = "<th>Row</th><th>Prediction</th>";
+            table.appendChild(headerRow);
+
+            predictions.slice(0, 10).forEach((p, i) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `<td>${i + 1}</td><td>${p}</td>`;
+              table.appendChild(row);
+            });
+
+            resultContainer.innerHTML = "";
+            resultContainer.appendChild(table);
+
+            // Add "See More" button
+            const seeMoreButton = document.createElement("button");
+            seeMoreButton.classList.add("see-more");
+            seeMoreButton.textContent = "See More";
+            seeMoreButton.onclick = () => {
+              predictions.slice(10).forEach((p, i) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td>${i + 11}</td><td>${p}</td>`;
+                table.appendChild(row);
+              });
+              seeMoreButton.style.display = "none";
+            };
+            resultContainer.appendChild(seeMoreButton);
+
+            // Display chart
+            const yesCount = predictions.filter((p) => p === "Yes").length;
+            const noCount = predictions.filter((p) => p === "No").length;
+
+            const ctx = document
+              .getElementById("prediction-chart")
+              .getContext("2d");
+            document.getElementById("prediction-chart").style.display = "block";
+
+            new Chart(ctx, {
+              type: "pie",
+              data: {
+                labels: ["Yes", "No"],
+                datasets: [
+                  {
+                    data: [yesCount, noCount],
+                    backgroundColor: ["#ff6384", "#36a2eb"],
+                  },
+                ],
+              },
+            });
           }
         } catch (error) {
-          document.getElementById(
-            "prediction-result"
-          ).innerHTML = `<p class="error">Error: ${error}</p>`;
+          resultContainer.innerHTML = `<p>Error: ${error}</p>`;
+        }
+      }
+
+      async function makeIndividualPrediction(event) {
+        event.preventDefault();
+
+        const form = document.getElementById("individual-prediction-form");
+        const formData = new FormData(form);
+
+        const resultContainer = document.getElementById("individual-result");
+
+        try {
+          const response = await fetch("/", {
+            method: "POST",
+            body: formData,
+          });
+
+          const result = await response.json();
+
+          if (result.error) {
+            resultContainer.innerHTML = `<p>${result.error}</p>`;
+          } else {
+            resultContainer.innerHTML = `<p>Prediction: ${result.prediction}</p>`;
+          }
+        } catch (error) {
+          resultContainer.innerHTML = `<p>Error: ${error}</p>`;
         }
       }
     </script>
