@@ -29,3 +29,4 @@ Logistic Regression/ KNN/ SVM/ Decision tree/ Random forest/ GBM/ XGboost/ Light
    (All the models listed above with hyperparameters fine-tuning)<br>
 5. Evaluation<br>
 6. Deployment<br>
+   (Flask + HTML + CSS + Vanilla Js)
